@@ -1,0 +1,237 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta
+      name="description"
+      content="Order Jinnamee's Patisserie Signature Cream Puff Box for pickup or customer-paid Lalamove."
+    >
+    <title>Jinnamee's Signature Cream Puff Box</title>
+    <link rel="preload" href="assets/cream-puff-hero-banner.jpg" as="image">
+    <link rel="stylesheet" href="styles.css">
+  </head>
+  <body>
+    <a class="skip-link" href="#order">Skip to order</a>
+
+    <header class="site-header" data-header>
+      <a class="brand" href="#top" aria-label="Jinnamee's Patisserie home">
+        <span class="brand-mark">J</span>
+        <span>
+          <span class="brand-name">Jinnamee's Patisserie</span>
+          <span class="brand-note">Signature cream puffs</span>
+        </span>
+      </a>
+      <nav class="site-nav" aria-label="Primary navigation">
+        <a href="#order">Order</a>
+        <a href="#delivery">Pickup &amp; Lalamove</a>
+        <a href="https://www.facebook.com/jinnameespatisserie" target="_blank" rel="noreferrer">Facebook</a>
+      </nav>
+    </header>
+
+    <main id="top">
+      <section class="hero" aria-labelledby="hero-title">
+        <img
+          class="hero-image"
+          src="assets/cream-puff-hero-banner.jpg"
+          alt="Jinnamee's signature cream puffs in gift boxes"
+        >
+        <div class="hero-copy">
+          <p class="eyebrow">Best seller</p>
+          <h1 id="hero-title">Signature Cream Puff Box</h1>
+          <p>
+            Golden choux shells with a soft crackly top and smooth cream filling, packed for pickup
+            or Jinnamee-booked Lalamove.
+          </p>
+          <a class="button button-primary" href="#order">Order for ₱155</a>
+        </div>
+      </section>
+
+      <section class="quick-info" id="delivery" aria-label="Order options">
+        <div>
+          <span>Product</span>
+          <strong>Signature Cream Puff Box</strong>
+        </div>
+        <div>
+          <span>Pickup</span>
+          <strong>Confirmed through Messenger</strong>
+        </div>
+        <div>
+          <span>Lalamove</span>
+          <strong>Jinnamee books rider, customer pays fee</strong>
+        </div>
+      </section>
+
+      <section class="order-section" id="order" aria-labelledby="order-title">
+        <article class="product-card">
+          <div class="product-media">
+            <img src="assets/cream-puff-box-wide.jpg" alt="Boxes of Jinnamee's cream puffs">
+            <span class="badge">Best seller</span>
+          </div>
+          <div class="product-copy">
+            <p class="eyebrow">Fresh by preorder</p>
+            <h2 id="order-title">Signature Cream Puff Box</h2>
+            <p>
+              A shareable box of cream puffs with light pastry, soft crumb topping, and smooth cream filling.
+            </p>
+            <div class="price-row">
+              <span>Price per box (6 pieces)</span>
+              <strong>₱155</strong>
+            </div>
+          </div>
+        </article>
+
+        <form class="order-form" data-order-form>
+          <div class="form-heading">
+            <p class="eyebrow">Messenger order</p>
+            <h2>Place your order</h2>
+          </div>
+
+          <fieldset class="quantity-card">
+            <legend>Quantity</legend>
+            <div class="quantity-control">
+              <button type="button" data-quantity-minus aria-label="Decrease quantity">-</button>
+              <output data-quantity>1</output>
+              <button type="button" data-quantity-plus aria-label="Increase quantity">+</button>
+            </div>
+          </fieldset>
+
+          <label>
+            <span>Name</span>
+            <input type="text" name="customerName" autocomplete="name" placeholder="Customer name" required>
+          </label>
+
+          <label>
+            <span>Contact number</span>
+            <input type="tel" name="contactNumber" autocomplete="tel" placeholder="09XX XXX XXXX" required>
+          </label>
+
+          <label class="remember-details">
+            <input type="checkbox" name="rememberDetails" data-remember-details>
+            <span>Remember my details for next time</span>
+          </label>
+
+          <div class="schedule-row">
+            <label>
+              <span>Preferred date</span>
+              <input type="date" name="preferredDate" required>
+            </label>
+
+            <label>
+              <span>Preferred time</span>
+              <input type="text" name="preferredTime" placeholder="3 PM or around 5:30 PM" required>
+            </label>
+          </div>
+
+          <label>
+            <span>Pickup or Lalamove</span>
+            <select name="fulfillment" data-fulfillment>
+              <option value="Pickup">Pickup</option>
+              <option value="Lalamove - Jinnamee books rider, customer pays fee">Lalamove - Jinnamee books, customer pays fee</option>
+            </select>
+          </label>
+
+          <section class="pickup-location" data-pickup-location aria-label="Pickup location">
+            <div class="pickup-location-copy">
+              <span>Pickup location</span>
+              <a href="https://maps.app.goo.gl/FFJx3Umqaqbdw6dR8" target="_blank" rel="noreferrer">
+                Open in Google Maps
+              </a>
+            </div>
+            <iframe
+              title="Jinnamee's Patisserie pickup location on Google Maps"
+              src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3850.1275030682423!2d120.64801687575005!3d15.206187185355088!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3396ef006ee4f525%3A0x4dd933289ea503a9!2sJinnamee%E2%80%99s%20Cookies!5e0!3m2!1sen!2sph!4v1781549585786!5m2!1sen!2sph"
+              loading="lazy"
+              allowfullscreen
+              referrerpolicy="no-referrer-when-downgrade"
+            ></iframe>
+          </section>
+
+          <fieldset class="delivery-fields" data-delivery-fields>
+            <legend>Lalamove delivery details</legend>
+
+            <label>
+              <span>Delivery address / landmark</span>
+              <input
+                type="text"
+                name="deliveryAddress"
+                autocomplete="street-address"
+                placeholder="House number, street, barangay, landmark"
+              >
+            </label>
+
+            <div class="field-group">
+              <div class="field-label-line">
+                <label for="mapsLink">Google Maps link</label>
+                <span class="tooltip-wrap">
+                  <button
+                    class="tooltip-button"
+                    type="button"
+                    data-tooltip-toggle
+                    aria-expanded="false"
+                    aria-controls="maps-link-help"
+                    aria-label="How to copy a Google Maps link"
+                  >
+                    ?
+                  </button>
+                </span>
+              </div>
+              <p class="tooltip-panel" id="maps-link-help" role="tooltip" data-tooltip-panel hidden>
+                Open Google Maps, search your location, tap Share, then Copy link.
+              </p>
+              <input id="mapsLink" type="url" name="mapsLink" inputmode="url" placeholder="Paste Google Maps link">
+            </div>
+
+            <button class="button button-secondary location-button" type="button" data-use-location>
+              Use my current location
+            </button>
+            <p class="location-status" data-location-status role="status" aria-live="polite"></p>
+          </fieldset>
+
+          <label>
+            <span>Notes</span>
+            <textarea name="notes" rows="4" placeholder="Special requests or delivery reminder"></textarea>
+          </label>
+
+          <div class="summary-box">
+            <div>
+              <span data-summary-label>Total</span>
+              <strong data-subtotal>₱155</strong>
+            </div>
+            <p data-summary-note>Pickup total.</p>
+          </div>
+
+          <button class="button button-primary checkout-button" type="button" data-checkout>
+            Copy order for Messenger
+          </button>
+          <p class="checkout-status" data-checkout-status role="status" aria-live="polite"></p>
+        </form>
+      </section>
+    </main>
+
+    <section class="order-modal" data-order-modal aria-hidden="true" aria-labelledby="modal-title">
+      <div class="modal-backdrop" data-modal-close></div>
+      <div class="modal-panel" role="dialog" aria-modal="true">
+        <p class="eyebrow">Order copied</p>
+        <h2 id="modal-title">Ready for Messenger</h2>
+        <p>Your order message is copied and ready to paste in Messenger.</p>
+        <div class="modal-actions">
+          <a
+            class="button button-primary"
+            href="https://m.me/jinnameespatisserie"
+            target="_blank"
+            rel="noreferrer"
+            data-messenger-link
+          >
+            Open Messenger
+          </a>
+          <button class="button button-secondary" type="button" data-modal-close>Done</button>
+        </div>
+      </div>
+    </section>
+
+    <div class="toast" data-toast role="status" aria-live="polite"></div>
+
+    <script src="app.js"></script>
+  </body>
+</html>
