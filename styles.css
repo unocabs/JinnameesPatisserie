@@ -251,56 +251,66 @@ h2 {
 
 .quick-info {
   display: grid;
-  gap: 0;
+  gap: 0.75rem;
   margin-top: clamp(1.4rem, 4vw, 2.2rem);
-  border: 1px solid var(--line);
-  border-radius: var(--radius);
-  background: rgba(255, 255, 255, 0.74);
-  box-shadow: 0 18px 42px rgba(67, 38, 24, 0.08);
-  overflow: hidden;
+  padding: 0.75rem;
+  border: 1px solid rgba(234, 216, 202, 0.9);
+  border-radius: calc(var(--radius) + 4px);
+  background:
+    linear-gradient(135deg, rgba(255, 255, 255, 0.86), rgba(255, 248, 241, 0.78)),
+    var(--surface);
+  box-shadow: 0 18px 46px rgba(67, 38, 24, 0.1);
 }
 
-.quick-info div {
+.quick-info-card {
   position: relative;
   display: grid;
   grid-template-columns: auto minmax(0, 1fr);
-  gap: 0.35rem 0.78rem;
+  gap: 0.28rem 0.85rem;
   align-items: center;
-  padding: 1rem;
-  background: linear-gradient(135deg, rgba(255, 255, 255, 0.94), rgba(255, 248, 241, 0.78));
+  min-width: 0;
+  padding: 0.95rem;
+  border: 1px solid rgba(234, 216, 202, 0.78);
+  border-radius: var(--radius);
+  background: rgba(255, 255, 255, 0.82);
 }
 
-.quick-info div + div {
-  border-top: 1px solid var(--line);
-}
-
-.quick-info div::before {
+.quick-icon {
   display: grid;
   grid-row: span 2;
   place-items: center;
-  width: 2.15rem;
-  height: 2.15rem;
+  width: 2.65rem;
+  height: 2.65rem;
   border: 1px solid rgba(189, 124, 40, 0.28);
   border-radius: 50%;
   background: var(--cream);
   color: var(--gold);
-  font-size: 0.82rem;
-  font-weight: 900;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.72);
 }
 
-.quick-info div:nth-child(1)::before {
-  content: "P";
+.quick-icon svg {
+  width: 1.55rem;
+  height: 1.55rem;
+  fill: none;
+  stroke: currentColor;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-width: 2.35;
 }
 
-.quick-info div:nth-child(2)::before {
-  content: "PU";
+.quick-info-card:nth-child(2) .quick-icon {
+  color: var(--rose);
+  background: #fde8ee;
+  border-color: rgba(170, 52, 80, 0.24);
 }
 
-.quick-info div:nth-child(3)::before {
-  content: "L";
+.quick-info-card:nth-child(3) .quick-icon {
+  color: #5c6b34;
+  background: #eef3d6;
+  border-color: rgba(92, 107, 52, 0.24);
 }
 
-.quick-info span,
+.quick-label,
 .price-row span,
 .summary-box span {
   display: block;
@@ -310,7 +320,7 @@ h2 {
   text-transform: uppercase;
 }
 
-.quick-info strong,
+.quick-info-card strong,
 .price-row strong,
 .summary-box strong {
   display: block;
@@ -318,7 +328,7 @@ h2 {
   font-size: 1.05rem;
 }
 
-.quick-info strong {
+.quick-info-card strong {
   margin-top: 0;
   line-height: 1.28;
 }
@@ -780,11 +790,6 @@ h2 {
 
   .quick-info {
     grid-template-columns: repeat(3, 1fr);
-  }
-
-  .quick-info div + div {
-    border-top: 0;
-    border-left: 1px solid var(--line);
   }
 
   .modal-actions {
