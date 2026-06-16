@@ -1,7 +1,7 @@
 (function () {
   const PRODUCT = {
     name: "Signature Cream Puff Box",
-    price: 155
+    price: 150
   };
   const BUSINESS = {
     name: "Jinnamee's Patisserie",
