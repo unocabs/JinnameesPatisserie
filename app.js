@@ -16,7 +16,8 @@
   const REMEMBER_KEY = "jinnameesRememberedDetails";
 
   const state = {
-    quantity: 1
+    quantity: 1,
+    latestOrderMessage: ""
   };
 
   const els = {
@@ -41,6 +42,9 @@
     modal: document.querySelector("[data-order-modal]"),
     modalClose: document.querySelectorAll("[data-modal-close]"),
     messengerLink: document.querySelector("[data-messenger-link]"),
+    messagePreview: document.querySelector("[data-message-preview]"),
+    copyPreview: document.querySelector("[data-copy-preview]"),
+    copyPreviewStatus: document.querySelector("[data-copy-preview-status]"),
     toast: document.querySelector("[data-toast]")
   };
 
@@ -62,6 +66,7 @@
     });
     els.fulfillment.addEventListener("change", saveRememberedDetailsIfEnabled);
     els.checkout.addEventListener("click", checkout);
+    els.copyPreview.addEventListener("click", copyPreviewMessage);
     els.modalClose.forEach((element) => element.addEventListener("click", closeModal));
 
     window.addEventListener("keydown", (event) => {
@@ -170,6 +175,7 @@
     const message = buildOrderMessage();
     const messengerUrl = BUSINESS.messengerUrl;
     saveRememberedDetailsIfEnabled();
+    setMessagePreview(message);
 
     copyToClipboard(message).finally(() => {
       els.checkoutStatus.textContent = "Order copied. Open Messenger and paste it to send.";
@@ -305,6 +311,22 @@
     textarea.remove();
   }
 
+  function setMessagePreview(message) {
+    state.latestOrderMessage = message;
+    els.messagePreview.value = message;
+    els.copyPreviewStatus.textContent = "";
+  }
+
+  function copyPreviewMessage() {
+    const message = state.latestOrderMessage || els.messagePreview.value;
+
+    if (!message) return;
+
+    copyToClipboard(message).then(() => {
+      els.copyPreviewStatus.textContent = "Copied again.";
+    });
+  }
+
   function openModal() {
     els.modal.setAttribute("aria-hidden", "false");
     document.body.classList.add("has-modal-open");
@@ -313,6 +335,7 @@
   function closeModal() {
     els.modal.setAttribute("aria-hidden", "true");
     document.body.classList.remove("has-modal-open");
+    els.copyPreviewStatus.textContent = "";
   }
 
   function isLalamove() {

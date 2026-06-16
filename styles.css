@@ -726,7 +726,9 @@ h2 {
   position: relative;
   display: grid;
   gap: 0.9rem;
-  width: min(100%, 420px);
+  width: min(100%, 560px);
+  max-height: calc(100vh - 2rem);
+  overflow: auto;
   padding: 1.2rem;
   border: 1px solid var(--line);
   border-radius: var(--radius);
@@ -749,6 +751,77 @@ h2 {
 .modal-panel p:not(.eyebrow) {
   margin: 0;
   color: var(--muted);
+}
+
+.message-preview {
+  display: grid;
+  gap: 0.5rem;
+  padding: 0.85rem;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: #fffaf6;
+}
+
+.message-preview-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  color: var(--muted);
+  font-size: 0.78rem;
+  font-weight: 900;
+  text-transform: uppercase;
+}
+
+.copy-preview-button {
+  display: grid;
+  place-items: center;
+  flex: 0 0 2.25rem;
+  width: 2.25rem;
+  height: 2.25rem;
+  border: 1px solid var(--line);
+  border-radius: 50%;
+  background: var(--cream);
+  color: var(--rose);
+  cursor: pointer;
+}
+
+.copy-preview-button:hover,
+.copy-preview-button:focus-visible {
+  border-color: rgba(170, 52, 80, 0.35);
+  background: #ffe6bd;
+}
+
+.copy-preview-button svg {
+  width: 1.1rem;
+  height: 1.1rem;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2.3;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.message-preview textarea {
+  width: 100%;
+  min-height: 10rem;
+  max-height: 16rem;
+  padding: 0.85rem;
+  border: 1px solid rgba(234, 216, 202, 0.9);
+  border-radius: var(--radius);
+  background: var(--surface);
+  color: var(--ink);
+  font-size: 0.9rem;
+  line-height: 1.45;
+  resize: vertical;
+}
+
+.modal-panel .message-preview .copy-preview-status {
+  min-height: 1.1rem;
+  margin: 0;
+  color: #2d6a4f;
+  font-size: 0.82rem;
+  font-weight: 800;
 }
 
 .modal-actions {

@@ -3,13 +3,83 @@
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Signature Cream Puff Box in Magalang, Pampanga | Jinnamee's Patisserie</title>
     <meta
       name="description"
-      content="Order Jinnamee's Patisserie Signature Cream Puff Box for pickup or customer-paid Lalamove."
+      content="Order Jinnamee's Patisserie Signature Cream Puff Box in Magalang, Pampanga. Fresh cream puffs for pickup or Jinnamee-booked Lalamove, with Messenger-ready ordering."
     >
-    <title>Jinnamee's Signature Cream Puff Box</title>
+    <meta
+      name="keywords"
+      content="Jinnamee's Patisserie, signature cream puff box, cream puffs Magalang, cream puffs Pampanga, bakery Magalang Pampanga, Lalamove cream puffs"
+    >
+    <meta name="robots" content="index, follow">
+    <link rel="canonical" href="https://jinnameespatisserie.com/">
+    <meta property="og:type" content="website">
+    <meta property="og:site_name" content="Jinnamee's Patisserie">
+    <meta property="og:title" content="Signature Cream Puff Box in Magalang, Pampanga | Jinnamee's Patisserie">
+    <meta
+      property="og:description"
+      content="Order Jinnamee's best-selling Signature Cream Puff Box in Magalang, Pampanga for pickup or Jinnamee-booked Lalamove through Messenger."
+    >
+    <meta property="og:url" content="https://jinnameespatisserie.com/">
+    <meta property="og:image" content="https://jinnameespatisserie.com/assets/cream-puff-hero-banner.jpg">
+    <meta property="og:image:alt" content="Jinnamee's signature cream puffs with cream filling and boxed cream puffs">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Signature Cream Puff Box in Magalang, Pampanga | Jinnamee's Patisserie">
+    <meta
+      name="twitter:description"
+      content="Cream puff boxes from Jinnamee's Patisserie in Magalang, Pampanga. Order by Messenger for pickup or Jinnamee-booked Lalamove."
+    >
+    <meta name="twitter:image" content="https://jinnameespatisserie.com/assets/cream-puff-hero-banner.jpg">
+    <link rel="icon" type="image/svg+xml" href="assets/favicon.svg">
     <link rel="preload" href="assets/cream-puff-hero-banner.jpg" as="image">
     <link rel="stylesheet" href="styles.css">
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "Bakery",
+        "name": "Jinnamee's Patisserie",
+        "url": "https://jinnameespatisserie.com/",
+        "image": "https://jinnameespatisserie.com/assets/cream-puff-hero-banner.jpg",
+        "description": "Jinnamee's Patisserie offers a best-selling Signature Cream Puff Box in Magalang, Pampanga with pickup and Jinnamee-booked Lalamove ordering through Messenger.",
+        "sameAs": [
+          "https://www.facebook.com/jinnameespatisserie"
+        ],
+        "address": {
+          "@type": "PostalAddress",
+          "addressLocality": "Magalang",
+          "addressRegion": "Pampanga",
+          "addressCountry": "PH"
+        },
+        "geo": {
+          "@type": "GeoCoordinates",
+          "latitude": 15.206187185355088,
+          "longitude": 120.64801687575005
+        },
+        "areaServed": [
+          {
+            "@type": "City",
+            "name": "Magalang"
+          },
+          {
+            "@type": "AdministrativeArea",
+            "name": "Pampanga"
+          }
+        ],
+        "makesOffer": {
+          "@type": "Offer",
+          "price": "150",
+          "priceCurrency": "PHP",
+          "availability": "https://schema.org/InStock",
+          "itemOffered": {
+            "@type": "Product",
+            "name": "Signature Cream Puff Box",
+            "image": "https://jinnameespatisserie.com/assets/cream-puff-box-wide.jpg",
+            "description": "A box of six signature cream puffs with golden choux shells, crackly topping, and smooth cream filling."
+          }
+        }
+      }
+    </script>
   </head>
   <body>
     <a class="skip-link" href="#order">Skip to order</a>
@@ -241,6 +311,25 @@
         <p class="eyebrow">Order copied</p>
         <h2 id="modal-title">Ready for Messenger</h2>
         <p>Your order message is copied and ready to paste in Messenger.</p>
+        <div class="message-preview">
+          <div class="message-preview-header">
+            <span>Message preview</span>
+            <button
+              class="copy-preview-button"
+              type="button"
+              data-copy-preview
+              aria-label="Copy order message again"
+              title="Copy message"
+            >
+              <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+                <rect x="9" y="9" width="10" height="10" rx="2"></rect>
+                <path d="M5 15V7a2 2 0 0 1 2-2h8"></path>
+              </svg>
+            </button>
+          </div>
+          <textarea data-message-preview readonly aria-label="Copied Messenger order message"></textarea>
+          <p class="copy-preview-status" data-copy-preview-status role="status" aria-live="polite"></p>
+        </div>
         <div class="modal-actions">
           <a
             class="button button-primary"
