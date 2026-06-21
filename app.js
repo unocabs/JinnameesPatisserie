@@ -341,6 +341,7 @@
     const needsDelivery = isLalamove();
     const payload = {
       _subject: `New Jinnamee Website Order - ${formData.get("customerName")?.trim() || "Customer"}`,
+      _cc: "jenmae03@gmail.com",
       _template: "table",
       _captcha: "false",
       _honey: formData.get("_honey") || "",
