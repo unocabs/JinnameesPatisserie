@@ -8,28 +8,46 @@
     messengerUrl: "https://m.me/jinnameespatisserie",
     pickupMapUrl: "https://maps.app.goo.gl/FFJx3Umqaqbdw6dR8"
   };
+  const STEP_NAMES = [
+    "Place your order",
+    "Customer details",
+    "Order details",
+    "Notes",
+    "Review and copy"
+  ];
+  const REMEMBER_KEY = "jinnameesRememberedDetails";
+  const mobileQuery = window.matchMedia("(max-width: 679px)");
   const peso = new Intl.NumberFormat("en-PH", {
     style: "currency",
     currency: "PHP",
     maximumFractionDigits: 0
   });
-  const REMEMBER_KEY = "jinnameesRememberedDetails";
 
   const state = {
     quantity: 1,
-    latestOrderMessage: ""
+    currentStep: 1,
+    latestOrderMessage: "",
+    mobileCopied: false
   };
 
   const els = {
     header: document.querySelector("[data-header]"),
     form: document.querySelector("[data-order-form]"),
+    steps: Array.from(document.querySelectorAll("[data-step]")),
+    nextButtons: document.querySelectorAll("[data-next-step]"),
+    previousButtons: document.querySelectorAll("[data-previous-step]"),
+    closeWizard: document.querySelector("[data-close-wizard]"),
+    currentStep: document.querySelector("[data-current-step]"),
+    stepName: document.querySelector("[data-step-name]"),
+    progressTrack: document.querySelector("[data-progress-track]"),
+    progressBar: document.querySelector("[data-progress-bar]"),
     minus: document.querySelector("[data-quantity-minus]"),
     plus: document.querySelector("[data-quantity-plus]"),
     quantity: document.querySelector("[data-quantity]"),
-    subtotal: document.querySelector("[data-subtotal]"),
+    subtotals: document.querySelectorAll("[data-subtotal]"),
     summaryLabel: document.querySelector("[data-summary-label]"),
     summaryNote: document.querySelector("[data-summary-note]"),
-    fulfillment: document.querySelector("[data-fulfillment]"),
+    fulfillmentOptions: Array.from(document.querySelectorAll("[data-fulfillment]")),
     pickupLocation: document.querySelector("[data-pickup-location]"),
     deliveryFields: document.querySelector("[data-delivery-fields]"),
     useLocation: document.querySelector("[data-use-location]"),
@@ -39,35 +57,56 @@
     rememberDetails: document.querySelector("[data-remember-details]"),
     checkout: document.querySelector("[data-checkout]"),
     checkoutStatus: document.querySelector("[data-checkout-status]"),
+    mobileMessagePreview: document.querySelector("[data-mobile-message-preview]"),
+    mobileCopy: document.querySelector("[data-mobile-copy]"),
+    mobileCopyText: document.querySelector("[data-mobile-copy-text]"),
+    mobileMessenger: document.querySelector("[data-mobile-messenger]"),
     modal: document.querySelector("[data-order-modal]"),
     modalClose: document.querySelectorAll("[data-modal-close]"),
     messengerLink: document.querySelector("[data-messenger-link]"),
     messagePreview: document.querySelector("[data-message-preview]"),
     copyPreview: document.querySelector("[data-copy-preview]"),
     copyPreviewStatus: document.querySelector("[data-copy-preview-status]"),
-    toast: document.querySelector("[data-toast]")
+    toast: document.querySelector("[data-toast]"),
+    toastText: document.querySelector("[data-toast-text]")
   };
 
+  els.rememberDetails.checked = true;
   loadRememberedDetails();
   bindEvents();
-  updateQuantity(0);
+  updateQuantity(0, false);
   updateDeliveryRequirement();
+  updateResponsiveMode();
 
   function bindEvents() {
     els.minus.addEventListener("click", () => updateQuantity(-1));
     els.plus.addEventListener("click", () => updateQuantity(1));
-    els.fulfillment.addEventListener("change", updateDeliveryRequirement);
+    els.fulfillmentOptions.forEach((option) => {
+      option.addEventListener("change", () => {
+        updateDeliveryRequirement();
+        saveRememberedDetailsIfEnabled();
+        invalidateMobileCopy();
+      });
+    });
     els.form.elements.deliveryAddress.addEventListener("input", updateDeliveryRequirement);
     els.useLocation.addEventListener("click", useCurrentLocation);
     els.tooltipToggle.addEventListener("click", toggleTooltip);
     els.rememberDetails.addEventListener("change", handleRememberDetailsChange);
-    ["customerName", "contactNumber", "deliveryAddress", "mapsLink"].forEach((fieldName) => {
-      els.form.elements[fieldName].addEventListener("input", saveRememberedDetailsIfEnabled);
+    els.form.addEventListener("input", handleFormInput);
+    els.nextButtons.forEach((button) => button.addEventListener("click", handleNextStep));
+    els.previousButtons.forEach((button) => {
+      button.addEventListener("click", () => showStep(Number(button.dataset.previousStep)));
     });
-    els.fulfillment.addEventListener("change", saveRememberedDetailsIfEnabled);
-    els.checkout.addEventListener("click", checkout);
+    els.closeWizard.addEventListener("click", () => showStep(1));
+    els.mobileCopy.addEventListener("click", copyMobileOrder);
+    els.mobileMessenger.addEventListener("click", preventLockedMessenger);
+    els.checkout.addEventListener("click", checkoutDesktop);
     els.copyPreview.addEventListener("click", copyPreviewMessage);
     els.modalClose.forEach((element) => element.addEventListener("click", closeModal));
+
+    const onBreakpointChange = () => updateResponsiveMode();
+    if (mobileQuery.addEventListener) mobileQuery.addEventListener("change", onBreakpointChange);
+    else mobileQuery.addListener(onBreakpointChange);
 
     window.addEventListener("keydown", (event) => {
       if (event.key === "Escape") {
@@ -87,13 +126,87 @@
     }, { passive: true });
   }
 
-  function updateQuantity(delta) {
+  function handleFormInput(event) {
+    if (event.target === els.rememberDetails) return;
+    saveRememberedDetailsIfEnabled();
+    invalidateMobileCopy();
+  }
+
+  function handleNextStep(event) {
+    const currentStep = Number(event.currentTarget.closest("[data-step]").dataset.step);
+    const nextStep = Number(event.currentTarget.dataset.nextStep);
+
+    if (!validateStep(currentStep)) return;
+    if (nextStep === 5) prepareMobileReview();
+    showStep(nextStep);
+  }
+
+  function validateStep(stepNumber) {
+    updateDeliveryRequirement();
+    const step = els.steps.find((item) => Number(item.dataset.step) === stepNumber);
+    const controls = Array.from(step.querySelectorAll("input, textarea, select"));
+    const invalidControl = controls.find((control) => control.willValidate && !control.checkValidity());
+
+    if (!invalidControl) return true;
+    invalidControl.reportValidity();
+    invalidControl.focus({ preventScroll: true });
+    invalidControl.scrollIntoView({ behavior: "smooth", block: "center" });
+    return false;
+  }
+
+  function validateEntireForm() {
+    updateDeliveryRequirement();
+    const controls = Array.from(els.form.elements);
+    const invalidControl = controls.find((control) => control.willValidate && !control.checkValidity());
+
+    if (!invalidControl) return true;
+    invalidControl.reportValidity();
+    invalidControl.focus();
+    return false;
+  }
+
+  function showStep(stepNumber) {
+    state.currentStep = Math.min(5, Math.max(1, stepNumber));
+    if (!mobileQuery.matches) return;
+
+    els.steps.forEach((step) => {
+      const isActive = Number(step.dataset.step) === state.currentStep;
+      step.classList.toggle("is-active", isActive);
+      step.setAttribute("aria-hidden", String(!isActive));
+    });
+
+    els.currentStep.textContent = state.currentStep;
+    els.stepName.textContent = STEP_NAMES[state.currentStep - 1];
+    els.progressTrack.setAttribute("aria-valuenow", state.currentStep);
+    els.progressBar.style.width = `${state.currentStep * 20}%`;
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  }
+
+  function updateResponsiveMode() {
+    document.body.classList.toggle("is-mobile-order", mobileQuery.matches);
+    if (mobileQuery.matches) {
+      closeModal();
+      showStep(state.currentStep);
+      return;
+    }
+
+    els.steps.forEach((step) => {
+      step.classList.add("is-active");
+      step.setAttribute("aria-hidden", "false");
+    });
+  }
+
+  function updateQuantity(delta, shouldPersist = true) {
     state.quantity = Math.max(1, state.quantity + delta);
     els.quantity.value = state.quantity;
     els.quantity.textContent = state.quantity;
     els.minus.disabled = state.quantity === 1;
-    els.subtotal.textContent = peso.format(total());
+    els.subtotals.forEach((element) => {
+      element.textContent = peso.format(total());
+    });
     updateSummaryCopy();
+    invalidateMobileCopy();
+    if (shouldPersist) saveRememberedDetailsIfEnabled();
   }
 
   function updateDeliveryRequirement() {
@@ -111,16 +224,21 @@
 
   function loadRememberedDetails() {
     const details = readRememberedDetails();
-
     if (!details) return;
 
+    state.quantity = Math.max(1, Number.parseInt(details.quantity, 10) || 1);
     els.form.elements.customerName.value = details.customerName || "";
     els.form.elements.contactNumber.value = details.contactNumber || "";
-    els.form.elements.fulfillment.value = details.fulfillment || "Pickup";
-    if (!els.form.elements.fulfillment.value) els.form.elements.fulfillment.value = "Pickup";
+    els.form.elements.preferredTime.value = details.preferredTime || "";
     els.form.elements.deliveryAddress.value = details.deliveryAddress || "";
     els.form.elements.mapsLink.value = details.mapsLink || "";
-    els.rememberDetails.checked = true;
+    els.form.elements.notes.value = details.notes || "";
+
+    const savedFulfillment = String(details.fulfillment || "Pickup").toLowerCase();
+    const matchingOption = els.fulfillmentOptions.find((option) => (
+      savedFulfillment.includes("lalamove") === option.value.toLowerCase().includes("lalamove")
+    ));
+    if (matchingOption) matchingOption.checked = true;
   }
 
   function handleRememberDetailsChange() {
@@ -128,7 +246,6 @@
       saveRememberedDetails();
       return;
     }
-
     removeRememberedDetails();
   }
 
@@ -139,11 +256,14 @@
   function saveRememberedDetails() {
     try {
       localStorage.setItem(REMEMBER_KEY, JSON.stringify({
+        quantity: state.quantity,
         customerName: els.form.elements.customerName.value.trim(),
         contactNumber: els.form.elements.contactNumber.value.trim(),
-        fulfillment: els.form.elements.fulfillment.value,
+        preferredTime: els.form.elements.preferredTime.value.trim(),
+        fulfillment: getFulfillment(),
         deliveryAddress: els.form.elements.deliveryAddress.value.trim(),
-        mapsLink: els.form.elements.mapsLink.value.trim()
+        mapsLink: els.form.elements.mapsLink.value.trim(),
+        notes: els.form.elements.notes.value.trim()
       }));
     } catch (error) {
       console.warn("Could not save remembered details.", error);
@@ -168,25 +288,61 @@
     }
   }
 
-  function checkout() {
-    updateDeliveryRequirement();
-    if (!els.form.reportValidity()) return;
+  function prepareMobileReview() {
+    const message = buildOrderMessage();
+    state.latestOrderMessage = message;
+    els.mobileMessagePreview.value = message;
+    invalidateMobileCopy();
+  }
+
+  function copyMobileOrder() {
+    const message = buildOrderMessage();
+    state.latestOrderMessage = message;
+    els.mobileMessagePreview.value = message;
+
+    copyToClipboard(message).then(() => {
+      state.mobileCopied = true;
+      els.mobileCopy.classList.add("is-copied");
+      els.mobileCopyText.textContent = "Copy Again";
+      els.mobileMessenger.href = BUSINESS.messengerUrl;
+      els.mobileMessenger.setAttribute("aria-disabled", "false");
+      els.mobileMessenger.removeAttribute("tabindex");
+      showToast("Copied Order Details");
+    });
+  }
+
+  function invalidateMobileCopy() {
+    state.mobileCopied = false;
+    els.mobileCopy.classList.remove("is-copied");
+    els.mobileCopyText.textContent = "Copy Order Details";
+    els.mobileMessenger.removeAttribute("href");
+    els.mobileMessenger.setAttribute("aria-disabled", "true");
+    els.mobileMessenger.setAttribute("tabindex", "-1");
+  }
+
+  function preventLockedMessenger(event) {
+    if (state.mobileCopied) return;
+    event.preventDefault();
+  }
+
+  function checkoutDesktop() {
+    if (!validateEntireForm()) return;
 
     const message = buildOrderMessage();
-    const messengerUrl = BUSINESS.messengerUrl;
     saveRememberedDetailsIfEnabled();
-    setMessagePreview(message);
+    setModalMessagePreview(message);
 
     copyToClipboard(message).finally(() => {
+      showToast("Order copied for Messenger");
       els.checkoutStatus.textContent = "Order copied. Open Messenger and paste it to send.";
-      els.messengerLink.href = messengerUrl;
+      els.messengerLink.href = BUSINESS.messengerUrl;
       openModal();
     });
   }
 
   function buildOrderMessage() {
     const formData = new FormData(els.form);
-    const fulfillment = formData.get("fulfillment");
+    const fulfillment = getFulfillment();
     const preferredDate = formData.get("preferredDate")?.trim();
     const preferredTime = formData.get("preferredTime")?.trim();
     const deliveryAddress = formData.get("deliveryAddress")?.trim();
@@ -245,6 +401,7 @@
       const lng = position.coords.longitude.toFixed(6);
       els.form.elements.mapsLink.value = `https://www.google.com/maps?q=${lat},${lng}`;
       saveRememberedDetailsIfEnabled();
+      invalidateMobileCopy();
       setLocationStatus("Location link added. Please still include your address or landmark.", "success");
       els.useLocation.disabled = false;
     }, () => {
@@ -280,15 +437,12 @@
     try {
       if (navigator.clipboard?.writeText) {
         await navigator.clipboard.writeText(message);
-        showToast("Order copied for Messenger.");
         return;
       }
     } catch (error) {
       console.warn("Clipboard API copy failed; trying fallback.", error);
     }
-
     copyWithTemporaryTextarea(message);
-    showToast("Order copied for Messenger.");
   }
 
   function copyWithTemporaryTextarea(message) {
@@ -307,11 +461,10 @@
     } catch (error) {
       console.warn("Fallback clipboard copy failed.", error);
     }
-
     textarea.remove();
   }
 
-  function setMessagePreview(message) {
+  function setModalMessagePreview(message) {
     state.latestOrderMessage = message;
     els.messagePreview.value = message;
     els.copyPreviewStatus.textContent = "";
@@ -319,7 +472,6 @@
 
   function copyPreviewMessage() {
     const message = state.latestOrderMessage || els.messagePreview.value;
-
     if (!message) return;
 
     copyToClipboard(message).then(() => {
@@ -328,6 +480,7 @@
   }
 
   function openModal() {
+    if (mobileQuery.matches) return;
     els.modal.setAttribute("aria-hidden", "false");
     document.body.classList.add("has-modal-open");
   }
@@ -338,8 +491,12 @@
     els.copyPreviewStatus.textContent = "";
   }
 
+  function getFulfillment() {
+    return els.fulfillmentOptions.find((option) => option.checked)?.value || "Pickup";
+  }
+
   function isLalamove() {
-    return els.fulfillment.value.toLowerCase().includes("lalamove");
+    return getFulfillment().toLowerCase().includes("lalamove");
   }
 
   function updateSummaryCopy() {
@@ -358,11 +515,11 @@
   }
 
   function showToast(message) {
-    els.toast.textContent = message;
+    els.toastText.textContent = message;
     els.toast.classList.add("is-visible");
     window.clearTimeout(showToast.timer);
     showToast.timer = window.setTimeout(() => {
       els.toast.classList.remove("is-visible");
-    }, 2500);
+    }, 1800);
   }
 })();

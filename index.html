@@ -86,8 +86,10 @@
 
     <header class="site-header" data-header>
       <a class="brand" href="#top" aria-label="Jinnamee's Patisserie home">
-        <span class="brand-mark">J</span>
-        <span>
+        <span class="brand-mark brand-image-mark" aria-hidden="true">
+          <img src="assets/jinnas-logo.png" alt="">
+        </span>
+        <span class="brand-copy">
           <span class="brand-name">Jinnamee's Patisserie</span>
           <span class="brand-note">Signature cream puffs</span>
         </span>
@@ -177,130 +179,256 @@
           </div>
         </article>
 
-        <form class="order-form" data-order-form>
+        <form class="order-form" data-order-form novalidate>
           <div class="form-heading">
             <p class="eyebrow">Messenger order</p>
             <h2>Place your order</h2>
           </div>
 
-          <fieldset class="quantity-card">
-            <legend>Quantity</legend>
-            <div class="quantity-control">
-              <button type="button" data-quantity-minus aria-label="Decrease quantity">-</button>
-              <output data-quantity>1</output>
-              <button type="button" data-quantity-plus aria-label="Increase quantity">+</button>
+          <div class="wizard-progress" aria-label="Order progress">
+            <div>
+              <span>Step <strong data-current-step>1</strong> of 5</span>
+              <span data-step-name>Place your order</span>
             </div>
-          </fieldset>
-
-          <label>
-            <span>Name</span>
-            <input type="text" name="customerName" autocomplete="name" placeholder="Customer name" required>
-          </label>
-
-          <label>
-            <span>Contact number</span>
-            <input type="tel" name="contactNumber" autocomplete="tel" placeholder="09XX XXX XXXX" required>
-          </label>
-
-          <label class="remember-details">
-            <input type="checkbox" name="rememberDetails" data-remember-details>
-            <span>Remember my details for next time</span>
-          </label>
-
-          <div class="schedule-row">
-            <label>
-              <span>Preferred date</span>
-              <input type="date" name="preferredDate" required>
-            </label>
-
-            <label>
-              <span>Preferred time</span>
-              <input type="text" name="preferredTime" placeholder="3 PM or around 5:30 PM" required>
-            </label>
+            <div class="progress-track" role="progressbar" aria-valuemin="1" aria-valuemax="5" aria-valuenow="1" data-progress-track>
+              <span data-progress-bar></span>
+            </div>
           </div>
 
-          <label>
-            <span>Pickup or Lalamove</span>
-            <select name="fulfillment" data-fulfillment>
-              <option value="Pickup">Pickup</option>
-              <option value="Lalamove - Jinnamee books rider, customer pays fee">Lalamove - Jinnamee books, customer pays fee</option>
-            </select>
-          </label>
-
-          <section class="pickup-location" data-pickup-location aria-label="Pickup location">
-            <div class="pickup-location-copy">
-              <span>Pickup location</span>
-              <a href="https://maps.app.goo.gl/FFJx3Umqaqbdw6dR8" target="_blank" rel="noreferrer">
-                Open in Google Maps
-              </a>
+          <section class="form-step is-active" data-step="1" aria-labelledby="step-1-title">
+            <div class="step-heading">
+              <p class="step-kicker">Step 1</p>
+              <h2 id="step-1-title">Place your order</h2>
             </div>
-            <iframe
-              title="Jinnamee's Patisserie pickup location on Google Maps"
-              src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3850.1275030682423!2d120.64801687575005!3d15.206187185355088!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3396ef006ee4f525%3A0x4dd933289ea503a9!2sJinnamee%E2%80%99s%20Cookies!5e0!3m2!1sen!2sph!4v1781549585786!5m2!1sen!2sph"
-              loading="lazy"
-              allowfullscreen
-              referrerpolicy="no-referrer-when-downgrade"
-            ></iframe>
+
+            <div class="quantity-summary-row">
+              <fieldset class="quantity-card">
+                <legend>Quantity</legend>
+                <div class="quantity-control">
+                  <button type="button" data-quantity-minus aria-label="Decrease quantity">-</button>
+                  <output data-quantity>1</output>
+                  <button type="button" data-quantity-plus aria-label="Increase quantity">+</button>
+                </div>
+              </fieldset>
+              <div class="mobile-live-subtotal">
+                <span>Subtotal</span>
+                <strong data-subtotal>₱150</strong>
+              </div>
+            </div>
+
+            <div class="price-row mobile-price-row">
+              <span>Price per box (6 pieces)</span>
+              <strong>₱150</strong>
+            </div>
+
+            <div class="mobile-step-actions single-action">
+              <button class="button button-primary" type="button" data-next-step="2">Continue</button>
+            </div>
           </section>
 
-          <fieldset class="delivery-fields" data-delivery-fields>
-            <legend>Lalamove delivery details</legend>
+          <section class="form-step" data-step="2" aria-labelledby="step-2-title">
+            <div class="step-heading">
+              <p class="step-kicker">Step 2</p>
+              <h2 id="step-2-title">Customer details</h2>
+            </div>
 
             <label>
-              <span>Delivery address / landmark</span>
-              <input
-                type="text"
-                name="deliveryAddress"
-                autocomplete="street-address"
-                placeholder="House number, street, barangay, landmark"
-              >
+              <span>Name</span>
+              <input type="text" name="customerName" autocomplete="name" placeholder="Customer name" required>
             </label>
 
-            <div class="field-group">
-              <div class="field-label-line">
-                <label for="mapsLink">Google Maps link</label>
-                <span class="tooltip-wrap">
-                  <button
-                    class="tooltip-button"
-                    type="button"
-                    data-tooltip-toggle
-                    aria-expanded="false"
-                    aria-controls="maps-link-help"
-                    aria-label="How to copy a Google Maps link"
-                  >
-                    ?
-                  </button>
+            <label>
+              <span>Contact number</span>
+              <input type="tel" name="contactNumber" autocomplete="tel" placeholder="09XX XXX XXXX" required>
+            </label>
+
+            <label class="remember-details">
+              <input type="checkbox" name="rememberDetails" data-remember-details checked>
+              <span>Remember my details for next time</span>
+            </label>
+
+            <div class="mobile-step-actions">
+              <button class="button button-secondary" type="button" data-previous-step="1">Back</button>
+              <button class="button button-primary" type="button" data-next-step="3">Continue</button>
+            </div>
+          </section>
+
+          <section class="form-step" data-step="3" aria-labelledby="step-3-title">
+            <div class="step-heading">
+              <p class="step-kicker">Step 3</p>
+              <h2 id="step-3-title">Order details</h2>
+            </div>
+
+            <div class="schedule-row">
+              <label>
+                <span>Preferred date</span>
+                <input type="date" name="preferredDate" required>
+              </label>
+
+              <label>
+                <span>Preferred time</span>
+                <input type="text" name="preferredTime" placeholder="3 PM or around 5:30 PM" required>
+              </label>
+            </div>
+
+            <fieldset class="fulfillment-options">
+              <legend>Pickup or Lalamove</legend>
+              <label class="fulfillment-choice">
+                <input type="radio" name="fulfillment" value="Pickup" data-fulfillment checked>
+                <span>
+                  <strong>Pickup</strong>
+                  <small>Pick up from Jinnamee's location</small>
                 </span>
+              </label>
+              <label class="fulfillment-choice">
+                <input
+                  type="radio"
+                  name="fulfillment"
+                  value="Lalamove - Jinnamee books rider, customer pays fee"
+                  data-fulfillment
+                >
+                <span>
+                  <strong>Lalamove</strong>
+                  <small>Jinnamee books rider, customer pays fee</small>
+                </span>
+              </label>
+            </fieldset>
+
+            <section class="pickup-location" data-pickup-location aria-label="Pickup location">
+              <div class="pickup-location-copy">
+                <span>Pickup location</span>
+                <a href="https://maps.app.goo.gl/FFJx3Umqaqbdw6dR8" target="_blank" rel="noreferrer">
+                  Open in Google Maps
+                </a>
               </div>
-              <p class="tooltip-panel" id="maps-link-help" role="tooltip" data-tooltip-panel hidden>
-                Open Google Maps, search your location, tap Share, then Copy link.
-              </p>
-              <input id="mapsLink" type="url" name="mapsLink" inputmode="url" placeholder="Paste Google Maps link">
+              <iframe
+                title="Jinnamee's Patisserie pickup location on Google Maps"
+                src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3850.1275030682423!2d120.64801687575005!3d15.206187185355088!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3396ef006ee4f525%3A0x4dd933289ea503a9!2sJinnamee%E2%80%99s%20Cookies!5e0!3m2!1sen!2sph!4v1781549585786!5m2!1sen!2sph"
+                loading="lazy"
+                allowfullscreen
+                referrerpolicy="no-referrer-when-downgrade"
+              ></iframe>
+            </section>
+
+            <fieldset class="delivery-fields" data-delivery-fields>
+              <legend>Lalamove delivery details</legend>
+
+              <label>
+                <span>Delivery address / landmark</span>
+                <input
+                  type="text"
+                  name="deliveryAddress"
+                  autocomplete="street-address"
+                  placeholder="House number, street, barangay, landmark"
+                >
+              </label>
+
+              <div class="field-group">
+                <div class="field-label-line">
+                  <label for="mapsLink">Google Maps link</label>
+                  <span class="tooltip-wrap">
+                    <button
+                      class="tooltip-button"
+                      type="button"
+                      data-tooltip-toggle
+                      aria-expanded="false"
+                      aria-controls="maps-link-help"
+                      aria-label="How to copy a Google Maps link"
+                    >
+                      ?
+                    </button>
+                  </span>
+                </div>
+                <p class="tooltip-panel" id="maps-link-help" role="tooltip" data-tooltip-panel hidden>
+                  Open Google Maps, search your location, tap Share, then Copy link.
+                </p>
+                <input id="mapsLink" type="url" name="mapsLink" inputmode="url" placeholder="Paste Google Maps link">
+              </div>
+
+              <button class="button button-secondary location-button" type="button" data-use-location>
+                Use my current location
+              </button>
+              <p class="location-status" data-location-status role="status" aria-live="polite"></p>
+            </fieldset>
+
+            <div class="mobile-step-actions">
+              <button class="button button-secondary" type="button" data-previous-step="2">Back</button>
+              <button class="button button-primary" type="button" data-next-step="4">Continue</button>
+            </div>
+          </section>
+
+          <section class="form-step" data-step="4" aria-labelledby="step-4-title">
+            <div class="step-heading">
+              <p class="step-kicker">Step 4</p>
+              <h2 id="step-4-title">Notes</h2>
+              <p>You can leave this blank.</p>
             </div>
 
-            <button class="button button-secondary location-button" type="button" data-use-location>
-              Use my current location
-            </button>
-            <p class="location-status" data-location-status role="status" aria-live="polite"></p>
-          </fieldset>
+            <label>
+              <span>Notes</span>
+              <textarea name="notes" rows="5" placeholder="Special requests or delivery reminder"></textarea>
+            </label>
 
-          <label>
-            <span>Notes</span>
-            <textarea name="notes" rows="4" placeholder="Special requests or delivery reminder"></textarea>
-          </label>
-
-          <div class="summary-box">
-            <div>
-              <span data-summary-label>Total</span>
-              <strong data-subtotal>₱150</strong>
+            <div class="mobile-step-actions">
+              <button class="button button-secondary" type="button" data-previous-step="3">Back</button>
+              <button class="button button-primary" type="button" data-next-step="5">Review order</button>
             </div>
-            <p data-summary-note>Pickup total.</p>
-          </div>
+          </section>
 
-          <button class="button button-primary checkout-button" type="button" data-checkout>
-            Copy order for Messenger
-          </button>
-          <p class="checkout-status" data-checkout-status role="status" aria-live="polite"></p>
+          <section class="form-step" data-step="5" aria-labelledby="step-5-title">
+            <div class="step-heading">
+              <p class="step-kicker">Step 5</p>
+              <h2 id="step-5-title">Review and copy</h2>
+            </div>
+
+            <div class="summary-box">
+              <div>
+                <span data-summary-label>Total</span>
+                <strong data-subtotal>₱150</strong>
+              </div>
+              <p data-summary-note>Pickup total.</p>
+            </div>
+
+            <div class="mobile-review">
+              <label for="mobileMessagePreview">Message preview</label>
+              <textarea
+                id="mobileMessagePreview"
+                class="mobile-message-preview"
+                data-mobile-message-preview
+                rows="11"
+                readonly
+              ></textarea>
+              <div class="mobile-final-cta">
+                <button class="button mobile-copy-button" type="button" data-mobile-copy>
+                  <svg class="copy-confirmed-icon" viewBox="0 0 24 24" aria-hidden="true">
+                    <path d="m5 12 4 4L19 6"></path>
+                  </svg>
+                  <span data-mobile-copy-text>Copy Order Details</span>
+                </button>
+                <a
+                  class="button mobile-messenger-button"
+                  data-mobile-messenger
+                  aria-disabled="true"
+                  tabindex="-1"
+                  target="_blank"
+                  rel="noreferrer"
+                >
+                  I will Paste this Order in Messenger
+                </a>
+                <div class="mobile-step-actions final-actions">
+                  <button class="button button-secondary" type="button" data-previous-step="4">Back</button>
+                  <button class="button button-secondary" type="button" data-close-wizard>Close</button>
+                </div>
+              </div>
+            </div>
+
+            <div class="desktop-checkout">
+              <button class="button button-primary checkout-button" type="button" data-checkout>
+                Copy order for Messenger
+              </button>
+              <p class="checkout-status" data-checkout-status role="status" aria-live="polite"></p>
+            </div>
+          </section>
         </form>
       </section>
     </main>
@@ -340,12 +468,17 @@
           >
             Open Messenger
           </a>
-          <button class="button button-secondary" type="button" data-modal-close>Done</button>
+          <button class="button button-secondary" type="button" data-modal-close>Close</button>
         </div>
       </div>
     </section>
 
-    <div class="toast" data-toast role="status" aria-live="polite"></div>
+    <div class="toast" data-toast role="status" aria-live="polite">
+      <svg viewBox="0 0 24 24" aria-hidden="true">
+        <path d="m5 12 4 4L19 6"></path>
+      </svg>
+      <span data-toast-text></span>
+    </div>
 
     <script src="app.js"></script>
   </body>
