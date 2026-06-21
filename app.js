@@ -8,6 +8,7 @@
     messengerUrl: "https://m.me/jinnameespatisserie",
     pickupMapUrl: "https://maps.app.goo.gl/FFJx3Umqaqbdw6dR8"
   };
+  const ORDER_EMAIL_ENDPOINT = "https://formsubmit.co/ajax/rgiancabrera@gmail.com";
   const STEP_NAMES = [
     "Place your order",
     "Customer details",
@@ -27,7 +28,8 @@
     quantity: 1,
     currentStep: 1,
     latestOrderMessage: "",
-    mobileCopied: false
+    mobileCopied: false,
+    emailStates: new Map()
   };
 
   const els = {
@@ -99,7 +101,7 @@
     });
     els.closeWizard.addEventListener("click", () => showStep(1));
     els.mobileCopy.addEventListener("click", copyMobileOrder);
-    els.mobileMessenger.addEventListener("click", preventLockedMessenger);
+    els.mobileMessenger.addEventListener("click", handleMobileMessengerClick);
     els.checkout.addEventListener("click", checkoutDesktop);
     els.copyPreview.addEventListener("click", copyPreviewMessage);
     els.modalClose.forEach((element) => element.addEventListener("click", closeModal));
@@ -320,9 +322,73 @@
     els.mobileMessenger.setAttribute("tabindex", "-1");
   }
 
-  function preventLockedMessenger(event) {
-    if (state.mobileCopied) return;
-    event.preventDefault();
+  function handleMobileMessengerClick(event) {
+    if (!state.mobileCopied) {
+      event.preventDefault();
+      return;
+    }
+
+    sendOrderEmail();
+  }
+
+  function sendOrderEmail() {
+    const message = buildOrderMessage();
+    const existingState = state.emailStates.get(message);
+    if (existingState === "sending" || existingState === "sent") return;
+
+    state.emailStates.set(message, "sending");
+    const formData = new FormData(els.form);
+    const needsDelivery = isLalamove();
+    const payload = {
+      _subject: `New Jinnamee Website Order - ${formData.get("customerName")?.trim() || "Customer"}`,
+      _template: "table",
+      _captcha: "false",
+      _honey: formData.get("_honey") || "",
+      "Website source": "JNP-WEB",
+      "Product": PRODUCT.name,
+      "Quantity": String(state.quantity),
+      "Price per box": peso.format(PRODUCT.price),
+      "Customer name": formData.get("customerName")?.trim() || "",
+      "Contact number": formData.get("contactNumber")?.trim() || "",
+      "Preferred date": formData.get("preferredDate")?.trim() || "",
+      "Preferred time": formData.get("preferredTime")?.trim() || "",
+      "Order option": getFulfillment(),
+      "Order amount": needsDelivery
+        ? `${peso.format(total())} subtotal before delivery fee`
+        : `${peso.format(total())} total`,
+      "Notes": formData.get("notes")?.trim() || "None",
+      "Messenger action": "Customer clicked I will Paste this Order in Messenger",
+      "Submitted at": new Date().toLocaleString("en-PH", { timeZone: "Asia/Manila" })
+    };
+
+    if (needsDelivery) {
+      payload["Delivery address / landmark"] = formData.get("deliveryAddress")?.trim() || "";
+      payload["Google Maps link"] = formData.get("mapsLink")?.trim() || "Not provided";
+      payload["Delivery fee"] = "Customer pays; Jinnamee can book the rider";
+    } else {
+      payload["Pickup location"] = BUSINESS.pickupMapUrl;
+    }
+
+    try {
+      fetch(ORDER_EMAIL_ENDPOINT, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "Accept": "application/json"
+        },
+        body: JSON.stringify(payload),
+        keepalive: true
+      }).then((response) => {
+        if (!response.ok) throw new Error(`Order email request failed with ${response.status}`);
+        state.emailStates.set(message, "sent");
+      }).catch((error) => {
+        state.emailStates.delete(message);
+        console.warn("Order email could not be sent.", error);
+      });
+    } catch (error) {
+      state.emailStates.delete(message);
+      console.warn("Order email could not be started.", error);
+    }
   }
 
   function checkoutDesktop() {
@@ -381,7 +447,9 @@
       "",
       needsDelivery
         ? "Please confirm availability, Lalamove booking details, delivery fee, and final total. Thank you!"
-        : "Please confirm availability, pickup instructions, and final total. Thank you!"
+        : "Please confirm availability, pickup instructions, and final total. Thank you!",
+      "",
+      "Thanks for ordering at jinnameespatisserie.com!"
     );
 
     return messageLines.join("\n");

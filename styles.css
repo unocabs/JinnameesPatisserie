@@ -425,6 +425,16 @@ h2 {
   padding: clamp(1rem, 4vw, 1.35rem);
 }
 
+.form-honey {
+  position: absolute;
+  left: -9999px;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  opacity: 0;
+  pointer-events: none;
+}
+
 .form-step,
 .quantity-summary-row,
 .desktop-checkout {
@@ -1204,10 +1214,28 @@ h2 {
 
   .schedule-row label {
     min-width: 0;
+    overflow: hidden;
   }
 
   .schedule-row input {
+    display: block;
+    inline-size: 100%;
     min-width: 0;
+    min-inline-size: 0;
+    max-width: 100%;
+    max-inline-size: 100%;
+  }
+
+  .schedule-row input[type="date"] {
+    -webkit-appearance: none;
+    appearance: none;
+    padding-right: 0.55rem;
+    padding-left: 0.55rem;
+  }
+
+  .schedule-row input[type="date"]::-webkit-date-and-time-value {
+    min-width: 0;
+    text-align: left;
   }
 
   .fulfillment-options {
@@ -1370,6 +1398,12 @@ h2 {
   .toast.is-visible {
     opacity: 1;
     transform: translate(-50%, -50%);
+  }
+}
+
+@media (max-width: 389px) {
+  .schedule-row {
+    grid-template-columns: 1fr;
   }
 }
 
