@@ -528,10 +528,12 @@ h2 {
 .step-heading,
 .mobile-step-actions,
 .mobile-live-subtotal,
-.mobile-price-row,
-.step-one-totals,
 .mobile-review {
   display: none;
+}
+
+.step-one-totals {
+  display: contents;
 }
 
 .form-heading {
