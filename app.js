@@ -1,7 +1,11 @@
 (function () {
   const PRODUCT = {
     name: "Signature Cream Puff Box",
-    price: 150
+    price: 150,
+    flavors: {
+      original: "Original",
+      chocolate: "Chocolate"
+    }
   };
   const BUSINESS = {
     name: "Jinnamee's Patisserie",
@@ -17,6 +21,7 @@
     "Review and copy"
   ];
   const REMEMBER_KEY = "jinnameesRememberedDetails";
+  const QUANTITY_STORAGE_VERSION = 2;
   const mobileQuery = window.matchMedia("(max-width: 679px)");
   const peso = new Intl.NumberFormat("en-PH", {
     style: "currency",
@@ -25,7 +30,12 @@
   });
 
   const state = {
-    quantity: 1,
+    quantities: {
+      original: 0,
+      chocolate: 0
+    },
+    carouselIndex: 0,
+    carouselTouchStartX: null,
     currentStep: 1,
     latestOrderMessage: "",
     mobileCopied: false,
@@ -43,10 +53,12 @@
     stepName: document.querySelector("[data-step-name]"),
     progressTrack: document.querySelector("[data-progress-track]"),
     progressBar: document.querySelector("[data-progress-bar]"),
-    minus: document.querySelector("[data-quantity-minus]"),
-    plus: document.querySelector("[data-quantity-plus]"),
-    quantity: document.querySelector("[data-quantity]"),
+    quantityButtons: Array.from(document.querySelectorAll("[data-quantity-change]")),
+    quantityOutputs: Array.from(document.querySelectorAll("[data-flavor-quantity]")),
+    quantityFieldset: document.querySelector("[data-flavor-quantities]"),
+    quantityError: document.querySelector("[data-quantity-error]"),
     subtotals: document.querySelectorAll("[data-subtotal]"),
+    preferredDate: document.querySelector("[name='preferredDate']"),
     summaryLabel: document.querySelector("[data-summary-label]"),
     summaryNote: document.querySelector("[data-summary-note]"),
     fulfillmentOptions: Array.from(document.querySelectorAll("[data-fulfillment]")),
@@ -70,19 +82,39 @@
     copyPreview: document.querySelector("[data-copy-preview]"),
     copyPreviewStatus: document.querySelector("[data-copy-preview-status]"),
     toast: document.querySelector("[data-toast]"),
-    toastText: document.querySelector("[data-toast-text]")
+    toastText: document.querySelector("[data-toast-text]"),
+    carousel: document.querySelector("[data-carousel]"),
+    carouselSlides: Array.from(document.querySelectorAll("[data-carousel-slide]")),
+    carouselDots: Array.from(document.querySelectorAll("[data-carousel-dot]")),
+    carouselPrevious: document.querySelector("[data-carousel-previous]"),
+    carouselNext: document.querySelector("[data-carousel-next]")
   };
 
   els.rememberDetails.checked = true;
   loadRememberedDetails();
   bindEvents();
-  updateQuantity(0, false);
+  refreshDateMinimum();
+  renderQuantities(false);
+  showCarouselSlide(0);
   updateDeliveryRequirement();
   updateResponsiveMode();
 
   function bindEvents() {
-    els.minus.addEventListener("click", () => updateQuantity(-1));
-    els.plus.addEventListener("click", () => updateQuantity(1));
+    els.quantityButtons.forEach((button) => {
+      button.addEventListener("click", () => {
+        updateQuantity(button.dataset.flavor, Number(button.dataset.quantityChange));
+      });
+    });
+    els.preferredDate.addEventListener("input", validatePreferredDate);
+    els.preferredDate.addEventListener("focus", refreshDateMinimum);
+    els.carouselPrevious.addEventListener("click", () => showCarouselSlide(state.carouselIndex - 1));
+    els.carouselNext.addEventListener("click", () => showCarouselSlide(state.carouselIndex + 1));
+    els.carouselDots.forEach((dot) => {
+      dot.addEventListener("click", () => showCarouselSlide(Number(dot.dataset.carouselDot)));
+    });
+    els.carousel.addEventListener("keydown", handleCarouselKeydown);
+    els.carousel.addEventListener("touchstart", handleCarouselTouchStart, { passive: true });
+    els.carousel.addEventListener("touchend", handleCarouselTouchEnd, { passive: true });
     els.fulfillmentOptions.forEach((option) => {
       option.addEventListener("change", () => {
         updateDeliveryRequirement();
@@ -126,6 +158,10 @@
     window.addEventListener("scroll", () => {
       els.header.classList.toggle("is-scrolled", window.scrollY > 10);
     }, { passive: true });
+    window.addEventListener("focus", refreshDateMinimum);
+    document.addEventListener("visibilitychange", () => {
+      if (!document.hidden) refreshDateMinimum();
+    });
   }
 
   function handleFormInput(event) {
@@ -145,6 +181,11 @@
 
   function validateStep(stepNumber) {
     updateDeliveryRequirement();
+    if (stepNumber === 1 && !validateFlavorQuantity()) return false;
+    if (stepNumber === 3) {
+      refreshDateMinimum();
+      validatePreferredDate();
+    }
     const step = els.steps.find((item) => Number(item.dataset.step) === stepNumber);
     const controls = Array.from(step.querySelectorAll("input, textarea, select"));
     const invalidControl = controls.find((control) => control.willValidate && !control.checkValidity());
@@ -158,6 +199,9 @@
 
   function validateEntireForm() {
     updateDeliveryRequirement();
+    if (!validateFlavorQuantity()) return false;
+    refreshDateMinimum();
+    validatePreferredDate();
     const controls = Array.from(els.form.elements);
     const invalidControl = controls.find((control) => control.willValidate && !control.checkValidity());
 
@@ -198,17 +242,41 @@
     });
   }
 
-  function updateQuantity(delta, shouldPersist = true) {
-    state.quantity = Math.max(1, state.quantity + delta);
-    els.quantity.value = state.quantity;
-    els.quantity.textContent = state.quantity;
-    els.minus.disabled = state.quantity === 1;
+  function updateQuantity(flavor, delta, shouldPersist = true) {
+    if (!(flavor in state.quantities)) return;
+    state.quantities[flavor] = Math.max(0, state.quantities[flavor] + delta);
+    renderQuantities(shouldPersist);
+  }
+
+  function renderQuantities(shouldPersist = true) {
+    els.quantityOutputs.forEach((output) => {
+      output.value = state.quantities[output.dataset.flavorQuantity];
+      output.textContent = state.quantities[output.dataset.flavorQuantity];
+    });
+    els.quantityButtons.forEach((button) => {
+      if (Number(button.dataset.quantityChange) < 0) {
+        button.disabled = state.quantities[button.dataset.flavor] === 0;
+      }
+    });
     els.subtotals.forEach((element) => {
       element.textContent = peso.format(total());
     });
+    validateFlavorQuantity(false);
     updateSummaryCopy();
     invalidateMobileCopy();
     if (shouldPersist) saveRememberedDetailsIfEnabled();
+  }
+
+  function validateFlavorQuantity(announce = true) {
+    const isValid = totalQuantity() > 0;
+    els.quantityFieldset.setAttribute("aria-invalid", String(!isValid));
+    els.quantityError.textContent = isValid || !announce ? "" : "Choose at least one Original or Chocolate box.";
+    els.quantityError.classList.toggle("is-visible", !isValid && announce);
+    if (!isValid && announce) {
+      els.quantityFieldset.scrollIntoView({ behavior: "smooth", block: "center" });
+      els.quantityButtons.find((button) => Number(button.dataset.quantityChange) > 0)?.focus({ preventScroll: true });
+    }
+    return isValid;
   }
 
   function updateDeliveryRequirement() {
@@ -228,7 +296,10 @@
     const details = readRememberedDetails();
     if (!details) return;
 
-    state.quantity = Math.max(1, Number.parseInt(details.quantity, 10) || 1);
+    if (details.quantityStorageVersion === QUANTITY_STORAGE_VERSION) {
+      state.quantities.original = parseRememberedQuantity(details.originalQuantity);
+      state.quantities.chocolate = parseRememberedQuantity(details.chocolateQuantity);
+    }
     els.form.elements.customerName.value = details.customerName || "";
     els.form.elements.contactNumber.value = details.contactNumber || "";
     els.form.elements.preferredTime.value = details.preferredTime || "";
@@ -258,7 +329,9 @@
   function saveRememberedDetails() {
     try {
       localStorage.setItem(REMEMBER_KEY, JSON.stringify({
-        quantity: state.quantity,
+        quantityStorageVersion: QUANTITY_STORAGE_VERSION,
+        originalQuantity: state.quantities.original,
+        chocolateQuantity: state.quantities.chocolate,
         customerName: els.form.elements.customerName.value.trim(),
         contactNumber: els.form.elements.contactNumber.value.trim(),
         preferredTime: els.form.elements.preferredTime.value.trim(),
@@ -280,6 +353,11 @@
       console.warn("Could not load remembered details.", error);
       return null;
     }
+  }
+
+  function parseRememberedQuantity(value) {
+    const parsed = Number.parseInt(value, 10);
+    return Number.isFinite(parsed) ? Math.max(0, parsed) : 0;
   }
 
   function removeRememberedDetails() {
@@ -347,7 +425,9 @@
       _honey: formData.get("_honey") || "",
       "Website source": "JNP-WEB",
       "Product": PRODUCT.name,
-      "Quantity": String(state.quantity),
+      "Original boxes": String(state.quantities.original),
+      "Chocolate boxes": String(state.quantities.chocolate),
+      "Total boxes": String(totalQuantity()),
       "Price per box": peso.format(PRODUCT.price),
       "Customer name": formData.get("customerName")?.trim() || "",
       "Contact number": formData.get("contactNumber")?.trim() || "",
@@ -415,6 +495,12 @@
     const deliveryAddress = formData.get("deliveryAddress")?.trim();
     const mapsLink = formData.get("mapsLink")?.trim();
     const needsDelivery = isLalamove();
+    const itemLines = Object.entries(PRODUCT.flavors)
+      .filter(([flavor]) => state.quantities[flavor] > 0)
+      .map(([flavor, label]) => {
+        const quantity = state.quantities[flavor];
+        return `- ${quantity} x ${label} ${PRODUCT.name} (${peso.format(PRODUCT.price)} each): ${peso.format(quantity * PRODUCT.price)}`;
+      });
     const messageLines = [
       `Hello ${BUSINESS.name}! I would like to order your Signature Cream Puff Box from your website.`,
       "",
@@ -437,7 +523,7 @@
     messageLines.push(
       "",
       "Items:",
-      `- ${state.quantity} x ${PRODUCT.name} (${peso.format(PRODUCT.price)} each): ${peso.format(total())}`,
+      ...itemLines,
       "",
       `${needsDelivery ? "Subtotal before delivery fee" : "Total"}: ${peso.format(total())}`,
       needsDelivery
@@ -454,6 +540,81 @@
     );
 
     return messageLines.join("\n");
+  }
+
+  function refreshDateMinimum() {
+    els.preferredDate.min = getTomorrowInManila();
+    validatePreferredDate();
+  }
+
+  function validatePreferredDate() {
+    const value = els.preferredDate.value;
+    const isTooEarly = value && value < els.preferredDate.min;
+    els.preferredDate.setCustomValidity(isTooEarly
+      ? "Please choose tomorrow or a later date for your preorder."
+      : "");
+    return !isTooEarly;
+  }
+
+  function getTomorrowInManila() {
+    const parts = new Intl.DateTimeFormat("en-CA", {
+      timeZone: "Asia/Manila",
+      year: "numeric",
+      month: "2-digit",
+      day: "2-digit"
+    }).formatToParts(new Date());
+    const values = Object.fromEntries(parts.map((part) => [part.type, part.value]));
+    const tomorrow = new Date(Date.UTC(
+      Number(values.year),
+      Number(values.month) - 1,
+      Number(values.day) + 1
+    ));
+    return [
+      tomorrow.getUTCFullYear(),
+      String(tomorrow.getUTCMonth() + 1).padStart(2, "0"),
+      String(tomorrow.getUTCDate()).padStart(2, "0")
+    ].join("-");
+  }
+
+  function showCarouselSlide(index) {
+    const slideCount = els.carouselSlides.length;
+    state.carouselIndex = (index + slideCount) % slideCount;
+    els.carouselSlides.forEach((slide, slideIndex) => {
+      const isActive = slideIndex === state.carouselIndex;
+      slide.classList.toggle("is-active", isActive);
+      slide.setAttribute("aria-hidden", String(!isActive));
+    });
+    els.carouselDots.forEach((dot, dotIndex) => {
+      const isActive = dotIndex === state.carouselIndex;
+      dot.classList.toggle("is-active", isActive);
+      if (isActive) dot.setAttribute("aria-current", "true");
+      else dot.removeAttribute("aria-current");
+    });
+  }
+
+  function handleCarouselKeydown(event) {
+    if (event.key === "ArrowLeft") {
+      event.preventDefault();
+      showCarouselSlide(state.carouselIndex - 1);
+    }
+    if (event.key === "ArrowRight") {
+      event.preventDefault();
+      showCarouselSlide(state.carouselIndex + 1);
+    }
+  }
+
+  function handleCarouselTouchStart(event) {
+    state.carouselTouchStartX = event.changedTouches[0]?.clientX ?? null;
+  }
+
+  function handleCarouselTouchEnd(event) {
+    if (state.carouselTouchStartX === null) return;
+    const endX = event.changedTouches[0]?.clientX;
+    if (endX === undefined) return;
+    const distance = endX - state.carouselTouchStartX;
+    state.carouselTouchStartX = null;
+    if (Math.abs(distance) < 45) return;
+    showCarouselSlide(state.carouselIndex + (distance < 0 ? 1 : -1));
   }
 
   function useCurrentLocation() {
@@ -580,7 +741,11 @@
   }
 
   function total() {
-    return state.quantity * PRODUCT.price;
+    return totalQuantity() * PRODUCT.price;
+  }
+
+  function totalQuantity() {
+    return Object.values(state.quantities).reduce((sum, quantity) => sum + quantity, 0);
   }
 
   function showToast(message) {

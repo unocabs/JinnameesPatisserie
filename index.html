@@ -162,9 +162,41 @@
 
       <section class="order-section" id="order" aria-labelledby="order-title">
         <article class="product-card">
-          <div class="product-media">
-            <img src="assets/cream-puff-box-wide.jpg" alt="Boxes of Jinnamee's cream puffs">
+          <div
+            class="product-media product-carousel"
+            data-carousel
+            role="region"
+            aria-label="Signature Cream Puff Box photos"
+            aria-roledescription="carousel"
+            tabindex="0"
+          >
+            <div class="carousel-track">
+              <figure class="carousel-slide is-active" data-carousel-slide aria-hidden="false">
+                <img src="assets/cream-puff-box-wide.jpg" alt="Boxes of Original Jinnamee's cream puffs">
+              </figure>
+              <figure class="carousel-slide" data-carousel-slide aria-hidden="true">
+                <img src="assets/chocolate-cream-puff-box.jpg" alt="Packaged Chocolate cream puff box" loading="lazy">
+              </figure>
+              <figure class="carousel-slide" data-carousel-slide aria-hidden="true">
+                <img src="assets/chocolate-cream-puff-tray.jpg" alt="Six Chocolate cream puffs in a tray" loading="lazy">
+              </figure>
+              <figure class="carousel-slide" data-carousel-slide aria-hidden="true">
+                <img src="assets/chocolate-cream-puff-filled.jpg" alt="Chocolate cream puff cut open to show its filling" loading="lazy">
+              </figure>
+            </div>
             <span class="badge">Best seller</span>
+            <button class="carousel-button carousel-previous" type="button" data-carousel-previous aria-label="Previous photo">
+              <span aria-hidden="true">&lsaquo;</span>
+            </button>
+            <button class="carousel-button carousel-next" type="button" data-carousel-next aria-label="Next photo">
+              <span aria-hidden="true">&rsaquo;</span>
+            </button>
+            <div class="carousel-dots" aria-label="Choose product photo">
+              <button type="button" class="is-active" data-carousel-dot="0" aria-label="Show photo 1" aria-current="true"></button>
+              <button type="button" data-carousel-dot="1" aria-label="Show photo 2"></button>
+              <button type="button" data-carousel-dot="2" aria-label="Show photo 3"></button>
+              <button type="button" data-carousel-dot="3" aria-label="Show photo 4"></button>
+            </div>
           </div>
           <div class="product-copy">
             <p class="eyebrow">Fresh by preorder</p>
@@ -203,23 +235,39 @@
             </div>
 
             <div class="quantity-summary-row">
-              <fieldset class="quantity-card">
-                <legend>Quantity</legend>
-                <div class="quantity-control">
-                  <button type="button" data-quantity-minus aria-label="Decrease quantity">-</button>
-                  <output data-quantity>1</output>
-                  <button type="button" data-quantity-plus aria-label="Increase quantity">+</button>
+              <fieldset class="quantity-card" data-flavor-quantities aria-describedby="quantity-error">
+                <legend>Boxes by flavor</legend>
+                <div class="flavor-quantity-list">
+                  <div class="flavor-quantity-row">
+                    <span class="flavor-name"><strong>Original</strong></span>
+                    <div class="quantity-control">
+                      <button type="button" data-flavor="original" data-quantity-change="-1" aria-label="Decrease Original boxes">-</button>
+                      <output data-flavor-quantity="original" aria-label="Original box quantity">0</output>
+                      <button type="button" data-flavor="original" data-quantity-change="1" aria-label="Increase Original boxes">+</button>
+                    </div>
+                  </div>
+                  <div class="flavor-quantity-row">
+                    <span class="flavor-name"><strong>Chocolate</strong></span>
+                    <div class="quantity-control">
+                      <button type="button" data-flavor="chocolate" data-quantity-change="-1" aria-label="Decrease Chocolate boxes">-</button>
+                      <output data-flavor-quantity="chocolate" aria-label="Chocolate box quantity">0</output>
+                      <button type="button" data-flavor="chocolate" data-quantity-change="1" aria-label="Increase Chocolate boxes">+</button>
+                    </div>
+                  </div>
                 </div>
+                <p class="quantity-error" id="quantity-error" data-quantity-error role="alert"></p>
               </fieldset>
-              <div class="mobile-live-subtotal">
-                <span>Subtotal</span>
-                <strong data-subtotal>₱150</strong>
-              </div>
             </div>
 
-            <div class="price-row mobile-price-row">
-              <span>Price per box (6 pieces)</span>
-              <strong>₱150</strong>
+            <div class="step-one-totals">
+              <div class="price-row mobile-price-row">
+                <span>Price per box (6 pieces)</span>
+                <strong>₱150</strong>
+              </div>
+              <div class="mobile-live-subtotal">
+                <span>Subtotal</span>
+                <strong data-subtotal>₱0</strong>
+              </div>
             </div>
 
             <div class="mobile-step-actions single-action">
@@ -385,7 +433,7 @@
             <div class="summary-box">
               <div>
                 <span data-summary-label>Total</span>
-                <strong data-subtotal>₱150</strong>
+                <strong data-subtotal>₱0</strong>
               </div>
               <p data-summary-note>Pickup total.</p>
             </div>
